@@ -138,7 +138,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
                     Log.i(TAG, "PlaybackStarted " + item.getToken() + " fired: " + percent);
                 }
                 playbackStartedFired = true;
-                sendPlaybackStartedEvent(item);
+                sendPlaybackStartedEvent(item, offsetInMilliseconds);
             }
             if(!almostDoneFired && percent > .8f){
                 if(BuildConfig.DEBUG) {
@@ -194,8 +194,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
      * Send an event back to Alexa that we're starting a speech event
      * https://developer.amazon.com/public/solutions/alexa/alexa-voice-service/reference/audioplayer#PlaybackNearlyFinished Event
      */
-    private void sendPlaybackStartedEvent(AvsItem item){
-        alexaManager.sendPlaybackStartedEvent(item, null);
+    private void sendPlaybackStartedEvent(AvsItem item, long milliseconds){
+        alexaManager.sendPlaybackStartedEvent(item, milliseconds, null);
         Log.i(TAG, "Sending SpeechStartedEvent");
     }
 
