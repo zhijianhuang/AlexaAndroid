@@ -40,7 +40,8 @@ public class DownChannelService extends Service {
     private AlexaManager alexaManager;
     private Call currentCall;
     private AndroidSystemHandler handler;
-
+    private Handler runnableHandler;
+    private Runnable pingRunnable;
 
     @Nullable
     @Override
@@ -56,6 +57,44 @@ public class DownChannelService extends Service {
         alexaManager = AlexaManager.getInstance(this);
         handler = AndroidSystemHandler.getInstance(this);
 
+        runnableHandler = new Handler(Looper.getMainLooper());
+        pingRunnable = new Runnable() {
+            @Override
+            public void run() {
+                TokenManager.getAccessToken(alexaManager.getAuthorizationManager().getAmazonAuthorizationManager(), DownChannelService.this, new TokenManager.TokenCallback() {
+                    @Override
+                    public void onSuccess(String token) {
+
+                        Log.i(TAG, "Sending heartbeat");
+                        final Request request = new Request.Builder()
+                                .url(alexaManager.getPingUrl())
+                                .get()
+                                .addHeader("Authorization", "Bearer " + token)
+                                .build();
+
+                        ClientUtil.getTLS12OkHttpClient()
+                                .newCall(request)
+                                .enqueue(new Callback() {
+                                    @Override
+                                    public void onFailure(Call call, IOException e) {
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(Call call, Response response) throws IOException {
+                                        runnableHandler.postDelayed(pingRunnable, 4 * 60 * 1000);
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(Throwable e) {
+
+                    }
+                });
+            }
+        };
+        
         openDownChannel();
 
     }
@@ -67,6 +106,7 @@ public class DownChannelService extends Service {
         if(currentCall != null){
             currentCall.cancel();
         }
+        runnableHandler.removeCallbacks(pingRunnable);
     }
 
 
@@ -97,7 +137,7 @@ public class DownChannelService extends Service {
                             @Override
                             public void success(AvsResponse result) {
                                 handler.handleItems(result);
-                                sendHeartbeat();
+                                runnableHandler.post(pingRunnable);
                             }
                         });
 
@@ -133,44 +173,4 @@ public class DownChannelService extends Service {
         });
     }
 
-    private void sendHeartbeat(){
-        TokenManager.getAccessToken(alexaManager.getAuthorizationManager().getAmazonAuthorizationManager(), DownChannelService.this, new TokenManager.TokenCallback() {
-            @Override
-            public void onSuccess(String token) {
-
-                Log.i(TAG, "Sending heartbeat");
-                final Request request = new Request.Builder()
-                        .url(alexaManager.getPingUrl())
-                        .get()
-                        .addHeader("Authorization", "Bearer " + token)
-                        .build();
-
-                ClientUtil.getTLS12OkHttpClient()
-                        .newCall(request)
-                        .enqueue(new Callback() {
-                            @Override
-                            public void onFailure(Call call, IOException e) {
-
-                            }
-
-                            @Override
-                            public void onResponse(Call call, Response response) throws IOException {
-
-                            }
-                        });
-
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        sendHeartbeat();
-                    }
-                }, 4 * 60 * 1000);
-            }
-
-            @Override
-            public void onFailure(Throwable e) {
-
-            }
-        });
-    }
 }
