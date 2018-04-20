@@ -19,6 +19,7 @@ import com.willblaschko.android.recorderview.RecorderView;
 
 import java.io.IOException;
 
+import ee.ioc.phon.android.speechutils.AudioRecorder;
 import ee.ioc.phon.android.speechutils.RawAudioRecorder;
 import okio.BufferedSink;
 
@@ -113,7 +114,7 @@ public class SendAudioActionFragment extends BaseListenerFragment {
     private DataRequestBody requestBody = new DataRequestBody() {
         @Override
         public void writeTo(BufferedSink sink) throws IOException {
-            while (recorder != null && !recorder.isPausing()) {
+            while (recorder != null && recorder.getState() != AudioRecorder.State.ERROR && !recorder.isPausing()) {
                 if(recorder != null) {
                     final float rmsdb = recorder.getRmsdb();
                     if(recorderView != null) {
