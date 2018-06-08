@@ -1,0 +1,10 @@
+android{
+    signingConfigs{
+        releaseConfig{
+            keyAlias 'android'
+            keyPassword 'android'
+            storeFile file("key.jks")
+            storePassword 'android'
+        }
+    }
+}
