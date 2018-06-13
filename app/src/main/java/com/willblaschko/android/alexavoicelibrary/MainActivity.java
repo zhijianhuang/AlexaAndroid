@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
+import com.willblaschko.android.alexavoicelibrary.actions.SendAudioActionFragment;
 
 import static com.willblaschko.android.alexavoicelibrary.R.id.frame;
 
@@ -39,8 +40,8 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         statusBar = findViewById(R.id.status_bar);
         status = (TextView) findViewById(R.id.status);
         loading = findViewById(R.id.loading);
-
-        ActionsFragment fragment = new ActionsFragment();
+        //ActionsFragment fragment = new ActionsFragment();
+        SendAudioActionFragment fragment = new SendAudioActionFragment();
         loadFragment(fragment, false);
     }
 

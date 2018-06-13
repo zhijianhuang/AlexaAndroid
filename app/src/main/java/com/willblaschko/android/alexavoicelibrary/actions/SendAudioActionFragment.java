@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -47,7 +48,7 @@ public class SendAudioActionFragment extends BaseListenerFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recorderView = (RecorderView) view.findViewById(R.id.recorder);
-        recorderView.setOnClickListener(new View.OnClickListener() {
+        /*recorderView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(recorder == null) {
@@ -56,13 +57,28 @@ public class SendAudioActionFragment extends BaseListenerFragment {
                     stopListening();
                 }
             }
-        });
+        });*/
+        recorderView.setOnTouchListener(onTouchListener);
     }
+
+    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    startListening();
+                    break;
+                case MotionEvent.ACTION_UP:
+                    stopListening();
+                    break;
+            }
+            return true;
+        }
+    };
 
     @Override
     public void onResume() {
         super.onResume();
-
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {

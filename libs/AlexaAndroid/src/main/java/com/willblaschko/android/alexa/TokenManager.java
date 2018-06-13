@@ -59,17 +59,19 @@ public class TokenManager {
     public static void getAccessToken(final Context context, @NotNull String authCode, @NotNull String codeVerifier, AmazonAuthorizationManager authorizationManager, @Nullable final TokenResponseCallback callback){
         //this url shouldn't be hardcoded, but it is, it's the Amazon auth access token endpoint
         String url = "https://api.amazon.com/auth/O2/token";
-
         //set up our arguments for the api call, these will be the call headers
         FormBody.Builder builder = new FormBody.Builder()
                 .add(ARG_GRANT_TYPE, "authorization_code")
                 .add(ARG_CODE, authCode);
-        try {
-            builder.add(ARG_REDIRECT_URI, authorizationManager.getRedirectUri());
-            builder.add(ARG_CLIENT_ID, authorizationManager.getClientId());
+        /*try {
+            Log.d(TAG, "getAccessToken: ARG_REDIRECT_URI-"+authorizationManager.getRedirectUri()+"-ARG_CLIENT_ID-"+authorizationManager.getClientId()+"-authCode-"+authCode);
+            builder.add(ARG_CLIENT_ID,authorizationManager.getClientId());
+            builder.add(ARG_REDIRECT_URI,authorizationManager.getRedirectUri());
         } catch (AuthError authError) {
             authError.printStackTrace();
-        }
+        }*/
+        builder.add(ARG_REDIRECT_URI, "amzn://com.willblaschko.android.alexavoicelibrary");
+        builder.add(ARG_CLIENT_ID, "amzn1.application-oa2-client.37f709d55e354ea6b4defad65b077f50");
         builder.add(ARG_CODE_VERIFIER, codeVerifier);
 
         OkHttpClient client = ClientUtil.getTLS12OkHttpClient();
@@ -100,18 +102,20 @@ public class TokenManager {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String s = response.body().string();
+                Log.d(TAG, "onResponse: "+s);
                 if(BuildConfig.DEBUG) {
                     Log.i(TAG, s);
                 }
                 final TokenResponse tokenResponse = new Gson().fromJson(s, TokenResponse.class);
                 //save our tokens to local shared preferences
-                saveTokens(context, tokenResponse);
+                firstsaveTokens(context, tokenResponse);
 
                 if(callback != null){
                     //bubble up success
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
+                            Log.d(TAG, "run: getAccessToken");
                             callback.onSuccess(tokenResponse);
                         }
                     });
@@ -166,8 +170,8 @@ public class TokenManager {
         FormBody.Builder builder = new FormBody.Builder()
                 .add(ARG_GRANT_TYPE, "refresh_token")
                 .add(ARG_REFRESH_TOKEN, refreshToken);
-            builder.add(ARG_CLIENT_ID, authorizationManager.getClientId());
-
+            //builder.add(ARG_CLIENT_ID, authorizationManager.getClientId());
+        builder.add(ARG_CLIENT_ID, "amzn1.application-oa2-client.37f709d55e354ea6b4defad65b077f50");
 
         OkHttpClient client = ClientUtil.getTLS12OkHttpClient();
 
@@ -214,7 +218,25 @@ public class TokenManager {
             }
         });
     }
+    /**
+     * Save our new tokens in SharePreferences so we can access them at a later point
+     * @param context
+     * @param tokenResponse
+     */
+    private static void firstsaveTokens(Context context, TokenResponse tokenResponse){
+        //REFRESH_TOKEN = tokenResponse.refresh_token;
+        //ACCESS_TOKEN = tokenResponse.access_token;
+        REFRESH_TOKEN = "Atzr|IwEBIGUNInVFXdag2LbQXZrvGvhi4zfin8trYWNFpdNVE6LIIaREGcpuaH3VTIdd0_4edtqIBQN6iZB1sfFcafjam-3QuwgGfkTYr4jh9GtrNpgnvHyxaGAoA8JFB2qwE10hoEJGnu_C4YcGFZKlCG_hV7iuFPUmhXz-6EAPyeOYi7mx9whkks_dF73hBN557_fSNSpmaVho31BcmEl4-GtZE5hXvNJrYz9S17y_8zYHpnquxtQm4Ufvplw6_gzlj7foGDjaS2ZrSLWarTtEHEA_S3EdReVKG2kh6LE8vD_o-j1dzfKmRkqJYqABxFm5hyFYwdTfZcJaXhVXzWQwEF0DdHEtIJL7grjii7wUi7DOXtafT4ysBmb5Ol2HwdMAdedMA6ruKOqG4jIqESMXor9-Wvdy8SfWpwUjcZo79vNOwO-gGD5fmsaKThcfFJKxuXhUtN0tltgqNeUMjAFwLADJIzOau3V4-w9dLygmcAUEopB9vIGLrzAYpOwJxTH-_E73EKGYvGDE35ZuanOAHcXozpuJ";
+        ACCESS_TOKEN = "Atza|IwEBIDGypdEEFV8J01xDz7tcfeJ2H8OuWTFtcdl_tPSlydK_NU8TJavz_mt1hLmJLJtFuCLrGLY4QqRNUuASDefZbBJQKLZT8StbZArwK5qZ8iF5usyScl99WWPAXtavCvkcJcwyy7Oc1EbGZg0RuOObdaBrbi71tXooS-mTqmd4ZOFHswFnL16A4iomsZbCRTOW2MihtqWNMNBzE0aO5-V70KiyOhjZ7LjZbGQ71sKIjY1v3JHmLm3rgoXpM9WNbJV4JUMYo1rg6-DNH5JopmRlku-sBe_0HoW3uc0mLSHEP8LFnJMAJH-Q-wtmtMWTr7HgBe0Xj43jVfrQfk7bYPxQEQz6FnbTNJyAveeoK4aJGiz8vCniD1TK-owa9UWafCsiz967mk_ECzw9ozlrVuDKHtOsBgM7hwypn1sZnLbFkLjEoCJVn6SE0W0E8M2CcFmPp9DY7R1I5IZKStqhhT_8NOxt2ZIIVDd1_QFAb8C_tSiv4tKjRk7mcEH7QesEh-ogrNlq05nxU9rUl9mMEjpIEb_R";
+        Log.d(TAG, "saveTokens: REFRESH_TOKEN"+REFRESH_TOKEN+"ACCESS_TOKEN"+ACCESS_TOKEN);
 
+        SharedPreferences.Editor preferences = Util.getPreferences(context.getApplicationContext()).edit();
+        preferences.putString(PREF_ACCESS_TOKEN, ACCESS_TOKEN);
+        preferences.putString(PREF_REFRESH_TOKEN, REFRESH_TOKEN);
+        //comes back in seconds, needs to be milis
+        preferences.putLong(PREF_TOKEN_EXPIRES, (System.currentTimeMillis() + tokenResponse.expires_in * 1000));
+        preferences.commit();
+    }
     /**
      * Save our new tokens in SharePreferences so we can access them at a later point
      * @param context
@@ -223,6 +245,9 @@ public class TokenManager {
     private static void saveTokens(Context context, TokenResponse tokenResponse){
         REFRESH_TOKEN = tokenResponse.refresh_token;
         ACCESS_TOKEN = tokenResponse.access_token;
+        //REFRESH_TOKEN = "Atzr|IwEBIM7J_-krLHoOKkcNcYU93IoelRFMynIxWOv7ry0T8VDOaLmbQ-PRJv3C4_oEbLsdStU5csB1oLUb2m3zAEBinGTshcpU92Qo__z314e0cIk5e0THVMnnbW9ctyBFdxaberAFfupAyqUkZHYloCxiLhLm6ew8AW9djOmYChEHnbYHmVyfIDKXhEtpHwgOSKWgDSYtr6e8MVI38x_VROr1W6tfIgh658UJZzDEfNXUax7YaQP6waLVBpTj4AQAi4Om2R43S1ECAT-QdfKpDmpkkPd7kEtYuEPY5dIfAvRuakPj5oEkyJw7k05XBaG9xnU3ADl2i7vnGiMM7lWRwY5j5xS2c7RdUyIP2rEJA69oAWa4tZub7otVdi-Y_DxhAxUR-YXtniJYs5JkogtDvY9odBUNdl84Jh14Xko0-_QB2silhd-niTCi_Pks705qX2HbkaOeoFq0E9oYznRIoGoWNTOHa0B4voiXo3v6YPPwhYiigss29mE800m0Fg0BXxeLENHFPzwwVzhgHi6v0lmqdJBxyt-vOLF2gNPs5F0Xy8CtOA";
+        //ACCESS_TOKEN = "Atza|IwEBIDnB4glWbDZWG7mshORcPd7RxfEkF5NHIk4m4uLgiWRh63nZhhD6SWfmITY7jcBmp3z47bDhCZBE30FWiQzE3WyVU4egYxnBDnEOQKeQhPeXrsO540xXHG2X6II4ezLKxbbePr6WoW3zt5ShJxYaE56lJsWbcIGb2gTxouZYUoU-fkQi4Utj9yLVYvxoWkBI3E-soyKKtJY9aGHhxU6HPqNcEOyCMg1rmZppzU2IvVZ5QybWaYXqlDXCPVSED6a9oo6PDmZG7m9L0YBOTU6L3mbJEJ8oAZeZHZe5v1qti_i1o0D-B95M_j17-3S88MObhhIakNKxyNfhw8hZ9NCFrtKFJu3OolS9WqNzYNApehbo9XBNoHpqG8hPOp_Piu_kgSUp7ZJmVUd60l2rM_n44BqfS-KJ5dqsCFqo3YxWT9F6ZkaAcwtu0gRV8DjS6cA8UCADoHTZcSaWkfz2ur21-lVz1K6tOqJvxapm0vQc6HbKEZ0KVVDC6oigfuzRwyTlzONHHh1mNnyIW1p4fRBdjvu6";
+        Log.d(TAG, "saveTokens: REFRESH_TOKEN"+REFRESH_TOKEN+"ACCESS_TOKEN"+ACCESS_TOKEN);
 
         SharedPreferences.Editor preferences = Util.getPreferences(context.getApplicationContext()).edit();
         preferences.putString(PREF_ACCESS_TOKEN, ACCESS_TOKEN);

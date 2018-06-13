@@ -115,7 +115,33 @@ public class AuthorizationManager {
         options.putString(AuthzConstants.BUNDLE_KEY.CODE_CHALLENGE.val, getCodeChallenge());
         options.putString(AuthzConstants.BUNDLE_KEY.CODE_CHALLENGE_METHOD.val, "S256");
 
-        mAuthManager.authorize(APP_SCOPES, options, authListener);
+        //mAuthManager.authorize(APP_SCOPES, options, authListener);
+        demoThing();
+    }
+
+    private void demoThing() {
+        String authCode ="ANvJXEEaPTVUtEfCBYiJ";
+
+        if(BuildConfig.DEBUG) {
+            Log.i(TAG, "Authorization successful");
+            Util.showAuthToast(mContext, "Authorization successful.");
+        }
+        TokenManager.getAccessToken(mContext, authCode, getCodeVerifier(), mAuthManager, new TokenManager.TokenResponseCallback() {
+            @Override
+            public void onSuccess(TokenManager.TokenResponse response) {
+
+                if(mCallback != null){
+                    mCallback.onSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                if(mCallback != null){
+                    mCallback.onError(error);
+                }
+            }
+        });
     }
 
     //An authorization callback to check when we get success/failure from the Amazon authentication server
@@ -128,12 +154,11 @@ public class AuthorizationManager {
         @Override
         public void onSuccess(Bundle response) {
             String authCode = response.getString(AuthzConstants.BUNDLE_KEY.AUTHORIZATION_CODE.val);
-
+            Log.d(TAG, "onSuccess: authCode"+authCode);
             if(BuildConfig.DEBUG) {
                 Log.i(TAG, "Authorization successful");
                 Util.showAuthToast(mContext, "Authorization successful.");
             }
-
             TokenManager.getAccessToken(mContext, authCode, getCodeVerifier(), mAuthManager, new TokenManager.TokenResponseCallback() {
                 @Override
                 public void onSuccess(TokenManager.TokenResponse response) {
