@@ -39,9 +39,9 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
         statusBar = findViewById(R.id.status_bar);
         status = (TextView) findViewById(R.id.status);
         loading = findViewById(R.id.loading);
-        loading.setVisibility(View.GONE);
+        /*loading.setVisibility(View.GONE);
         status.setVisibility(View.GONE);
-        statusBar.setVisibility(View.GONE);
+        statusBar.setVisibility(View.GONE);*/
         //ActionsFragment fragment = new ActionsFragment();
         SendAudioActionFragment fragment = new SendAudioActionFragment();
         loadFragment(fragment, false);
@@ -73,45 +73,45 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
 
     protected void stateListening(){
 
-        /*if(status != null) {
+        if(status != null) {
             status.setText(R.string.status_listening);
             loading.setVisibility(View.GONE);
             statusBar.animate().alpha(1);
-        }*/
+        }
     }
     protected void stateProcessing(){
 
-        /*if(status != null) {
+        if(status != null) {
             status.setText(R.string.status_processing);
             loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
-        }*/
+        }
     }
     protected void stateSpeaking(){
 
-        /*if(status != null) {
+        if(status != null) {
             status.setText(R.string.status_speaking);
             loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
-        }*/
+        }
     }
     protected void statePrompting(){
 
-        /*if(status != null) {
+        if(status != null) {
             status.setText("");
             loading.setVisibility(View.VISIBLE);
             statusBar.animate().alpha(1);
-        }*/
+        }
     }
     protected void stateFinished(){
-        /*if(status != null) {
+        if(status != null) {
             status.setText("");
             loading.setVisibility(View.GONE);
             statusBar.animate().alpha(0);
-        }*/
+        }
     }
     protected void stateNone(){
-        //statusBar.animate().alpha(0);
+        statusBar.animate().alpha(0);
     }
 
 

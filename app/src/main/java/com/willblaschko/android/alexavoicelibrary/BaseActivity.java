@@ -239,8 +239,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
                 @Override
                 public void run() {
                     long totalTime = System.currentTimeMillis() - startTime;
-                    Toast.makeText(BaseActivity.this, "Total request time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
-                    //Log.i(TAG, "Total request time: "+totalTime+" miliseconds");
+                    //Toast.makeText(BaseActivity.this, "Total request time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
+                    Log.i(TAG, "Total request time: "+totalTime+" miliseconds");
                 }
             });
         }
@@ -294,7 +294,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
                 @Override
                 public void run() {
                     long totalTime = System.currentTimeMillis() - startTime;
-                    Toast.makeText(BaseActivity.this, "Total interaction time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(BaseActivity.this, "Total interaction time: "+totalTime+" miliseconds", Toast.LENGTH_LONG).show();
                     Log.i(TAG, "Total interaction time: "+totalTime+" miliseconds");
                 }
             });

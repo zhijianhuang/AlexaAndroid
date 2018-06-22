@@ -18,21 +18,21 @@
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:layout_centerHorizontal="true"
-        android:padding="15dp"
+        android:padding="5dp"
         android:background="@color/colorPrimaryDark"
-        android:elevation="15dp"
+        android:elevation="5dp"
         android:id="@+id/status_bar"
         android:alpha="0">
 
         <ProgressBar
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:id="@+id/loading"
             android:layout_gravity="center"
             style="?android:attr/progressBarStyleLarge"
             android:visibility="visible"
-            android:layout_marginRight="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
             android:layout_marginLeft="0dp"
             android:layout_marginStart="0dp"/>
         <TextView
@@ -41,6 +41,7 @@
             android:textAppearance="?android:textAppearanceLarge"
             android:id="@+id/status"
             android:gravity="center"
+            android:textSize="10dp"
             android:layout_gravity="center"
             android:text="@string/status_listening"/>
     </LinearLayout>
